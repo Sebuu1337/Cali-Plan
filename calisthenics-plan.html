@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Calisthenics Plan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0a;color:#f0f0f0;font-family:'Courier New',Courier,monospace;min-height:100vh;-webkit-text-size-adjust:100%;font-size:14px}
+
+.wrap{padding:32px 18px 80px;max-width:600px;margin:0 auto}
+
+.sub{font-size:10px;letter-spacing:4px;color:#555;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(44px,13vw,80px);line-height:0.88;letter-spacing:2px;font-weight:900;text-transform:uppercase;margin-bottom:4px;font-family:Impact,'Arial Black',sans-serif}
+.divider{height:1px;background:#1a1a1a;margin:18px 0}
+
+/* tabs */
+.tabs{display:flex;border-bottom:1px solid #1a1a1a;margin-bottom:22px}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#555;cursor:pointer;font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 16px;-webkit-tap-highlight-color:transparent}
+.tab.active{color:#ccc;border-bottom-color:#ccc}
+
+/* week grid */
+.week-grid{display:flex;border:1px solid #1a1a1a;margin-bottom:22px;overflow:hidden}
+.wcell{flex:1;text-align:center;padding:8px 2px;border-right:1px solid #1a1a1a;font-size:9px}
+.wcell:last-child{border-right:none}
+.wday{color:#555;margin-bottom:3px}
+.wicon{font-size:13px;margin-bottom:1px}
+.wlabel{font-size:7px;color:#666}
+.wrest{color:#2a2a2a;font-size:14px;line-height:2}
+
+/* day buttons */
+.day-btns{display:flex;flex-wrap:wrap;gap:0;margin-bottom:18px}
+.dbtn{background:transparent;border:1px solid #222;color:#888;cursor:pointer;padding:11px 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;-webkit-tap-highlight-color:transparent;min-height:44px}
+.dbtn.active{color:#0a0a0a;border-color:transparent}
+
+/* date row */
+.date-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.date-label{font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase}
+.date-input{background:#111;border:1px solid #222;color:#ccc;font-family:'Courier New',monospace;font-size:13px;padding:6px 8px;outline:none;-webkit-appearance:none;border-radius:0;min-height:36px}
+
+/* day card */
+.day-card{margin-bottom:24px;border-width:1px;border-style:solid}
+.day-header{padding:14px 16px}
+.day-hrow{display:flex;justify-content:space-between;align-items:center}
+.day-title{font-size:28px;font-weight:900;font-family:Impact,'Arial Black',sans-serif;letter-spacing:2px;text-transform:uppercase}
+.day-focus{font-size:9px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.day-dur-label{font-size:8px;color:#444;letter-spacing:2px;text-transform:uppercase;text-align:right}
+.day-dur-val{font-size:22px;font-weight:900;color:#555;font-family:Impact,'Arial Black',sans-serif;text-align:right}
+
+.section-block{padding:10px 16px}
+.tag-chip{display:inline-block;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;background:#1a1a1a;color:#555;margin-bottom:4px}
+.section-text{font-size:10px;color:#666;line-height:1.6}
+
+.ex-list{padding:12px 16px}
+.ex-count{font-size:8px;letter-spacing:3px;color:#444;text-transform:uppercase;margin-bottom:10px}
+.ex-row{border:1px solid #1a1a1a;margin-bottom:5px;background:#0f0f0f}
+.ex-row.open{border-color:#333}
+.ex-head{display:flex;align-items:center;padding:12px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:52px}
+.ex-num{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;margin-right:12px;flex-shrink:0;border-width:1px;border-style:solid}
+.ex-name{flex:1;font-size:12px;letter-spacing:0.5px;color:#ddd;line-height:1.3}
+.ex-meta{display:flex;gap:12px;align-items:center;margin-left:8px;flex-shrink:0}
+.ex-stat{text-align:center}
+.ex-stat-label{font-size:7px;color:#444;letter-spacing:1px;text-transform:uppercase}
+.ex-stat-val{font-size:16px;font-weight:900;font-family:Impact,'Arial Black',sans-serif}
+.ex-stat-reps{font-size:11px;font-weight:bold;color:#666}
+.ex-arrow{color:#444;font-size:9px;margin-left:2px}
+.ex-detail{border-top:1px solid #151515}
+.ex-tip{padding:9px 12px 9px 48px;border-bottom:1px solid #151515;font-size:10px;color:#666;font-style:italic;line-height:1.6}
+
+/* log grid */
+.log-section{padding:12px 12px 14px}
+.log-label{font-size:8px;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:9px}
+.log-table{display:grid;grid-template-columns:24px 1fr 1.6fr;gap:5px 8px;align-items:center}
+.log-setnum{font-size:14px;font-weight:900;text-align:center;font-family:Impact,'Arial Black',sans-serif}
+.log-col-head{font-size:7px;color:#2a2a2a;letter-spacing:1px;text-transform:uppercase}
+.log-input{background:#111;border:1px solid #222;color:#ccc;font-family:'Courier New',monospace;font-size:13px;padding:7px 7px;outline:none;width:100%;border-radius:0;-webkit-appearance:none;min-height:36px}
+.log-input:focus{border-color:#555}
+.log-input::placeholder{color:#2a2a2a}
+
+/* progression */
+.prog-section{margin-bottom:24px}
+.prog-row{display:flex;gap:0;margin-bottom:6px;align-items:flex-start}
+.prog-week{font-size:9px;color:#555;letter-spacing:2px;white-space:nowrap;padding-top:2px;min-width:88px;text-transform:uppercase}
+.prog-line{width:1px;background:#1a1a1a;align-self:stretch;margin:0 10px;flex-shrink:0}
+.prog-tip{font-size:10px;color:#777;line-height:1.6}
+
+/* pullup note */
+.pullup-note{padding:14px 16px;margin-bottom:40px}
+.pullup-note-label{font-size:8px;letter-spacing:3px;text-transform:uppercase;margin-bottom:7px}
+.pullup-note-text{font-size:10px;color:#888;line-height:1.8}
+
+/* verlauf */
+.verlauf-empty{color:#444;font-size:11px;padding:20px 0}
+.verlauf-date{font-size:8px;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:8px;margin-top:20px}
+.verlauf-date:first-child{margin-top:0}
+.verlauf-day{margin-bottom:10px;border-width:1px;border-style:solid}
+.verlauf-day-header{padding:7px 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.verlauf-ex{padding:9px 12px;border-top:1px solid #1a1a1a}
+.verlauf-ex-name{font-size:10px;color:#aaa;margin-bottom:4px}
+.verlauf-set-row{display:flex;gap:10px;font-size:10px;margin-bottom:2px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sub">Calisthenics Trainingsplan</div>
+  <h1>FUNDAMENTALS<br><span id="title-accent">FIRST</span></h1>
+  <div class="divider"></div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('plan')">Plan</button>
+    <button class="tab" id="tab-verlauf" onclick="showTab('verlauf')">Verlauf</button>
+  </div>
+
+  <div id="view-plan">
+    <div id="week-grid" class="week-grid"></div>
+    <div id="day-btns" class="day-btns"></div>
+    <div class="date-row">
+      <div class="date-label">Training vom</div>
+      <input type="date" id="log-date" class="date-input">
+    </div>
+    <div id="day-card"></div>
+    <div class="prog-section">
+      <div style="font-size:8px;letter-spacing:3px;color:#444;text-transform:uppercase;margin-bottom:10px">8-Wochen Progression</div>
+      <div id="prog-list"></div>
+    </div>
+    <div class="pullup-note" style="border:1px solid rgba(232,255,90,.2);background:rgba(232,255,90,.04)">
+      <div class="pullup-note-label" style="color:rgba(232,255,90,.55)">⚠ Pull-Up & Griffkraft</div>
+      <div class="pullup-note-text">
+        Nutze das <span style="color:#E8FF5A">Resistenzband</span> konsequent — aber verwende dünnere Bänder sobald möglich.
+        Der <span style="color:#E8FF5A">Dead Hang</span> ist dein wichtigstes Griffkraft-Tool. Ziel: 3×40 Sek. Hang bevor du das dickste Band weglässt.
+        <span style="color:#E8FF5A">Lying Leg Raises</span> ersetzen vorerst Hanging Knee Raises — gleicher Muskel, kein Griffkraft-Limit.
+      </div>
+    </div>
+  </div>
+
+  <div id="view-verlauf" style="display:none">
+    <div id="verlauf-content"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+var days = [
+  {id:1,label:'Tag A',weekday:'Mo',focus:'Push + Core',color:'#E8FF5A',icon:'↑',
+   warmup:'5 Min — Armkreisen, Schulterrotation, Cat-Cow, 10x Kniebeuge ohne Last',
+   exercises:[
+    {name:'Push-Up',sets:4,reps:'8-12',note:'Schultern über Handgelenken, Körper gerade'},
+    {name:'Pike Push-Up',sets:3,reps:'6-10',note:'Hüfte hoch, Kopf Richtung Boden — Schultern trainieren'},
+    {name:'Dips (Stuhl/Bank)',sets:3,reps:'8-12',note:'Ellbogen eng am Körper'},
+    {name:'Hollow Body Hold',sets:3,reps:'20-30 Sek.',note:'Lendenwirbel am Boden, Beine gestreckt'},
+    {name:'Plank',sets:3,reps:'30-45 Sek.',note:'Hüfte nicht absinken, aktiv pressen'}
+   ],
+   cooldown:'3 Min — Brustdehnung, Trizepsdehnung, Kindshaltung'},
+  {id:2,label:'Tag B',weekday:'Di',focus:'Pull + Beine',color:'#5AFFE0',icon:'↓',
+   warmup:'5 Min — Schultermobi, Hüftkreisen, 10x Ausfallschritt, Band-Rotation',
+   exercises:[
+    {name:'Assisted Pull-Up (Band)',sets:4,reps:'5-8',note:'Dickeres Band = mehr Hilfe. Vollständige Streckung unten'},
+    {name:'Inverted Row (Tisch)',sets:3,reps:'8-12',note:'Ersatz für freien Pull-Up — zieht denselben Muskel'},
+    {name:'Dead Hang',sets:3,reps:'20-40 Sek.',note:'Griffkraftaufbau — aktiv die Schultern runterziehen'},
+    {name:'Kniebeuge',sets:4,reps:'10-15',note:'Knie über Zehen, Brust hoch'},
+    {name:'Glute Bridge',sets:3,reps:'12-15',note:'Hüfte oben kurz halten, Gesäß aktiv anspannen'}
+   ],
+   cooldown:'3 Min — Latsdehnung, Oberschenkeldehnung'},
+  {id:3,label:'Tag C',weekday:'Do',focus:'Push + Mobilität',color:'#FF8C5A',icon:'↑',
+   warmup:'5 Min — Thoraxrotation, Handgelenkkreisen, Schulterrollout an der Wand',
+   exercises:[
+    {name:'Decline Push-Up',sets:4,reps:'6-10',note:'Füße erhöht — mehr obere Brust & Schultern'},
+    {name:'Diamond Push-Up',sets:3,reps:'6-10',note:'Hände eng unter Brust — Trizeps Fokus'},
+    {name:'Seitliches Planken',sets:3,reps:'20-30 Sek./Seite',note:'Hüfte oben halten, kein Durchhängen'},
+    {name:'Scapula Push-Up',sets:3,reps:'10-12',note:'Schulterblätter spreizen & zusammenziehen — Schlüssel für Stabilität'},
+    {name:'L-Sit Versuch (Boden)',sets:3,reps:'10-15 Sek.',note:'Anfang: Beine angewinkelt auf Boden pressen'}
+   ],
+   cooldown:'5 Min — Kobra, Hund, Kindshaltung, Türrahmen-Brust'},
+  {id:4,label:'Tag D',weekday:'Fr',focus:'Pull + Ganzkörper',color:'#C45AFF',icon:'↓',
+   warmup:'5 Min — Band Pull-Apart, Schultermobilität, Beinheben im Stand',
+   exercises:[
+    {name:'Assisted Pull-Up (Band)',sets:5,reps:'4-7',note:'Heute mehr Volumen — Qualität über Quantität'},
+    {name:'Band-Face-Pull',sets:3,reps:'12-15',note:'Band auf Augenhöhe — Ellbogen zurück. Haltungskorrektur!'},
+    {name:'Ausfallschritt',sets:3,reps:'10/Seite',note:'Knie berührt fast Boden, Oberkörper aufrecht'},
+    {name:'Pike Push-Up',sets:3,reps:'6-8',note:'Schultern vorbereitend für Handstand-Drücken'},
+    {name:'Dead Hang',sets:4,reps:'20-40 Sek.',note:'Griffkraftaufbau — aktiv Schultern runterziehen. Ziel: 40 Sek.'},
+    {name:'Lying Leg Raises',sets:3,reps:'10-15',note:'Flach auf dem Boden, Beine gestreckt heben & kontrolliert senken — voller Bauch-Reiz ohne Griffkraft-Limit'}
+   ],
+   cooldown:'3 Min — Unterarmdehnung, Hüftbeuger, Schulter Cross-Body Stretch'}
+];
+
+var weekSchedule=[
+  {day:'Mo',trainDay:1},{day:'Di',trainDay:2},{day:'Mi',trainDay:null},
+  {day:'Do',trainDay:3},{day:'Fr',trainDay:4},{day:'Sa',trainDay:null},{day:'So',trainDay:null}
+];
+
+var progressionTips=[
+  {week:'Woche 1-2',tip:'Technik lernen. Lieber 5 saubere Wdh. als 10 schlechte.'},
+  {week:'Woche 3-4',tip:'1-2 Wdh. pro Satz hinzufügen wenn Technik stimmt.'},
+  {week:'Woche 5-6',tip:'Band-Stufe reduzieren beim Pull-Up oder Pause verkürzen.'},
+  {week:'Woche 7-8',tip:'Auf unassistierte Negatives (langsames Absenken) wechseln.'}
+];
+
+// ── STATE ─────────────────────────────────────────────
+var activeDay=0, expandedEx=null;
+var logDate=new Date().toISOString().slice(0,10);
+var log={};
+
+// ── STORAGE (safe, never crashes) ─────────────────────
+function tryLoad(){
+  try{
+    var s=localStorage.getItem('cali-log-v1');
+    if(s){log=JSON.parse(s);}
+  }catch(e){log={};}
+}
+function trySave(){
+  try{localStorage.setItem('cali-log-v1',JSON.stringify(log));}catch(e){}
+}
+function getEntry(did,ei,si){
+  try{return (log[logDate]&&log[logDate][did]&&log[logDate][did][ei]&&log[logDate][did][ei][si])||{reps:'',note:''};}
+  catch(e){return {reps:'',note:''};}
+}
+function setEntry(did,ei,si,field,val){
+  try{
+    if(!log[logDate])log[logDate]={};
+    if(!log[logDate][did])log[logDate][did]={};
+    if(!log[logDate][did][ei])log[logDate][did][ei]={};
+    if(!log[logDate][did][ei][si])log[logDate][did][ei][si]={reps:'',note:''};
+    log[logDate][did][ei][si][field]=val;
+    trySave();
+  }catch(e){}
+}
+function isDayLogged(did){
+  try{return Object.keys(log).some(function(d){return log[d]&&log[d][did];});}
+  catch(e){return false;}
+}
+
+// ── RENDER ────────────────────────────────────────────
+function hex(color,opacity){
+  // add opacity to hex color for background
+  return color+'Math.round(opacity*255).toString(16)';
+}
+
+function renderAll(){
+  renderAccent();
+  renderWeekGrid();
+  renderDayBtns();
+  renderDayCard();
+  renderProgression();
+  updateVerlaufTab();
+}
+
+function renderAccent(){
+  var d=days[activeDay];
+  document.getElementById('title-accent').style.color=d.color;
+}
+
+function renderWeekGrid(){
+  var d=days[activeDay];
+  var html='';
+  for(var i=0;i<weekSchedule.length;i++){
+    var w=weekSchedule[i];
+    var td=w.trainDay?days[w.trainDay-1]:null;
+    var bg=td?'background:'+td.color+'1a;':'';
+    html+='<div class="wcell" style="'+bg+'">';
+    html+='<div class="wday">'+w.day+'</div>';
+    if(td){
+      html+='<div class="wicon" style="color:'+td.color+'">'+td.icon+'</div>';
+      html+='<div class="wlabel">'+td.label+'</div>';
+    }else{
+      html+='<div class="wrest">·</div>';
+    }
+    html+='</div>';
+  }
+  document.getElementById('week-grid').innerHTML=html;
+}
+
+function renderDayBtns(){
+  var html='';
+  for(var i=0;i<days.length;i++){
+    var d=days[i];
+    var active=activeDay===i;
+    var logged=isDayLogged(d.id)?' ✓':'';
+    var style=active?'background:'+d.color+';border-color:'+d.color+';color:#0a0a0a;':'';
+    html+='<button class="dbtn'+(active?' active':'')+'" style="'+style+'" onclick="selectDay('+i+')">';
+    html+=d.icon+' '+d.label+logged;
+    html+='</button>';
+  }
+  document.getElementById('day-btns').innerHTML=html;
+}
+
+function renderDayCard(){
+  var d=days[activeDay];
+  var exHTML='';
+
+  for(var exIdx=0;exIdx<d.exercises.length;exIdx++){
+    var ex=d.exercises[exIdx];
+    var open=expandedEx===exIdx;
+
+    var setsHTML='';
+    if(open){
+      for(var si=0;si<ex.sets;si++){
+        var e=getEntry(d.id,exIdx,si);
+        setsHTML+=
+          '<div class="log-setnum" style="color:'+d.color+'">'+( si+1)+'</div>'+
+          '<input class="log-input" placeholder="'+ex.reps+'" value="'+esc(e.reps)+'" '+
+            'oninput="setEntry('+d.id+','+exIdx+','+si+',\'reps\',this.value)" '+
+            'onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()">'+
+          '<input class="log-input" placeholder="Notiz..." value="'+esc(e.note)+'" '+
+            'oninput="setEntry('+d.id+','+exIdx+','+si+',\'note\',this.value)" '+
+            'onclick="event.stopPropagation()" ontouchstart="event.stopPropagation()">';
+      }
+    }
+
+    exHTML+=
+      '<div class="ex-row'+(open?' open':'')+'">'+
+        '<div class="ex-head" onclick="toggleEx('+exIdx+')" ontouchend="tapEx('+exIdx+',event)">'+
+          '<div class="ex-num" style="color:'+d.color+';border-color:'+d.color+'66">'+( exIdx+1)+'</div>'+
+          '<div class="ex-name">'+ex.name+'</div>'+
+          '<div class="ex-meta">'+
+            '<div class="ex-stat">'+
+              '<div class="ex-stat-label">SÄTZE</div>'+
+              '<div class="ex-stat-val" style="color:'+d.color+'">'+ex.sets+'</div>'+
+            '</div>'+
+            '<div class="ex-stat">'+
+              '<div class="ex-stat-label">ZIEL</div>'+
+              '<div class="ex-stat-reps">'+ex.reps+'</div>'+
+            '</div>'+
+            '<div class="ex-arrow">'+(open?'▲':'▼')+'</div>'+
+          '</div>'+
+        '</div>'+
+        (open?
+          '<div class="ex-detail">'+
+            '<div class="ex-tip">&#128161; '+ex.note+'</div>'+
+            '<div class="log-section">'+
+              '<div class="log-label">Sätze eintragen</div>'+
+              '<div class="log-table">'+
+                '<div class="log-col-head">#</div>'+
+                '<div class="log-col-head">Wdh./Sek.</div>'+
+                '<div class="log-col-head">Notiz</div>'+
+                setsHTML+
+              '</div>'+
+            '</div>'+
+          '</div>'
+        :'')+
+      '</div>';
+  }
+
+  document.getElementById('day-card').innerHTML=
+    '<div class="day-card" style="border-color:'+d.color+'33">'+
+      '<div class="day-header" style="background:'+d.color+'18;border-bottom:1px solid '+d.color+'22">'+
+        '<div class="day-hrow">'+
+          '<div>'+
+            '<div class="day-title" style="color:'+d.color+'">'+d.label+'</div>'+
+            '<div class="day-focus">Fokus: '+d.focus+'</div>'+
+          '</div>'+
+          '<div>'+
+            '<div class="day-dur-label">Dauer</div>'+
+            '<div class="day-dur-val">~40 MIN</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="section-block" style="border-bottom:1px solid #1a1a1a;background:#0d0d0d">'+
+        '<span class="tag-chip">Warm-Up</span>'+
+        '<div class="section-text">'+d.warmup+'</div>'+
+      '</div>'+
+      '<div class="ex-list">'+
+        '<div class="ex-count">'+d.exercises.length+' Übungen — antippen zum Eintragen</div>'+
+        exHTML+
+      '</div>'+
+      '<div class="section-block" style="border-top:1px solid #1a1a1a;background:#0d0d0d">'+
+        '<span class="tag-chip">Cool-Down</span>'+
+        '<div class="section-text">'+d.cooldown+'</div>'+
+      '</div>'+
+    '</div>';
+}
+
+function renderProgression(){
+  var html='';
+  for(var i=0;i<progressionTips.length;i++){
+    var p=progressionTips[i];
+    html+='<div class="prog-row"><div class="prog-week">'+p.week+'</div><div class="prog-line"></div><div class="prog-tip">'+p.tip+'</div></div>';
+  }
+  document.getElementById('prog-list').innerHTML=html;
+}
+
+function renderVerlauf(){
+  var el=document.getElementById('verlauf-content');
+  var dates=Object.keys(log).sort().reverse();
+  if(!dates.length){
+    el.innerHTML='<div class="verlauf-empty">Noch keine Einträge. Starte ein Training!</div>';
+    return;
+  }
+  var html='';
+  for(var di=0;di<dates.length;di++){
+    var date=dates[di];
+    var dateEntry=log[date];
+    var dayHTML='';
+    var dayIds=Object.keys(dateEntry);
+    for(var dj=0;dj<dayIds.length;dj++){
+      var dayId=dayIds[dj];
+      var d=null;
+      for(var k=0;k<days.length;k++){if(days[k].id===Number(dayId)){d=days[k];break;}}
+      if(!d)continue;
+      var exRows='';
+      var exKeys=Object.keys(dateEntry[dayId]);
+      for(var ek=0;ek<exKeys.length;ek++){
+        var exIdx=exKeys[ek];
+        var ex=d.exercises[Number(exIdx)];
+        if(!ex)continue;
+        var sets=dateEntry[dayId][exIdx];
+        var setKeys=Object.keys(sets);
+        var filled=setKeys.filter(function(sk){return sets[sk].reps||sets[sk].note;});
+        if(!filled.length)continue;
+        var setRows='';
+        for(var fl=0;fl<filled.length;fl++){
+          var sk=filled[fl];
+          var v=sets[sk];
+          setRows+='<div class="verlauf-set-row">';
+          setRows+='<span style="color:#444">Satz '+(Number(sk)+1)+'</span>';
+          if(v.reps)setRows+='<span style="color:#ccc">'+esc(v.reps)+' Wdh.</span>';
+          if(v.note)setRows+='<span style="color:#666;font-style:italic">'+esc(v.note)+'</span>';
+          setRows+='</div>';
+        }
+        exRows+='<div class="verlauf-ex"><div class="verlauf-ex-name">'+ex.name+'</div>'+setRows+'</div>';
+      }
+      if(!exRows)continue;
+      dayHTML+='<div class="verlauf-day" style="border-color:'+d.color+'22">'+
+        '<div class="verlauf-day-header" style="background:'+d.color+'14;color:'+d.color+'">'+d.label+' — '+d.focus+'</div>'+
+        exRows+'</div>';
+    }
+    if(!dayHTML)continue;
+    html+='<div class="verlauf-date">'+date+'</div>'+dayHTML;
+  }
+  el.innerHTML=html||'<div class="verlauf-empty">Keine vollständigen Einträge.</div>';
+}
+
+function updateVerlaufTab(){
+  var count=Object.keys(log).length;
+  document.getElementById('tab-verlauf').textContent=count>0?'Verlauf ('+count+')':'Verlauf';
+}
+
+// ── ACTIONS ───────────────────────────────────────────
+var lastTap=0;
+function tapEx(exIdx,e){
+  // prevent double-fire with onclick on mobile
+  e.preventDefault();
+  var now=Date.now();
+  if(now-lastTap<300)return;
+  lastTap=now;
+  toggleEx(exIdx);
+}
+
+function toggleEx(exIdx){
+  expandedEx=expandedEx===exIdx?null:exIdx;
+  renderDayCard();
+}
+
+function selectDay(i){
+  activeDay=i;
+  expandedEx=null;
+  renderAccent();
+  renderWeekGrid();
+  renderDayBtns();
+  renderDayCard();
+}
+
+function showTab(tab){
+  var tabs=document.querySelectorAll('.tab');
+  if(tab==='plan'){
+    tabs[0].classList.add('active');tabs[1].classList.remove('active');
+    document.getElementById('view-plan').style.display='';
+    document.getElementById('view-verlauf').style.display='none';
+  }else{
+    tabs[1].classList.add('active');tabs[0].classList.remove('active');
+    document.getElementById('view-plan').style.display='none';
+    document.getElementById('view-verlauf').style.display='';
+    renderVerlauf();
+  }
+}
+
+function esc(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── INIT ──────────────────────────────────────────────
+tryLoad();
+document.getElementById('log-date').value=logDate;
+document.getElementById('log-date').addEventListener('change',function(e){
+  logDate=e.target.value;
+  renderDayCard();
+});
+renderAll();
+</script>
+</body>
+</html>
